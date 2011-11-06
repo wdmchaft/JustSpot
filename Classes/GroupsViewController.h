@@ -10,7 +10,7 @@
 
 @interface GroupsViewController : UITableViewController <UIGestureRecognizerDelegate> 
 
-@property (nonatomic, retain) NSArray *controllers;
+@property (nonatomic, retain) NSMutableArray *controllers;
 
 - (void)editDone;
 

@@ -33,15 +33,34 @@
 - (void)saveContext {
 		NSError *error = nil;
 		NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
-		if (managedObjectContext != nil) 
-		{
-			if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) 
-			{
+		if (managedObjectContext != nil) {
+			if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
 				NSLog(@"iLocker: can't save managed object context, error %@, %@", error, [error userInfo]);
 				abort();	
 			} 
 		}	
+}
+
+- (void)removeGroup:(NSString *)group {
+	NSEntityDescription *groupEntityDescription = [NSEntityDescription entityForName:@"Group"
+															  inManagedObjectContext:[[DataSource shared] managedObjectContext]];
+	
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(%K = %@)",	@"name", group]; 
+	
+	NSFetchRequest *request = [[NSFetchRequest alloc] init];
+	[request setEntity:groupEntityDescription];
+	[request setPredicate:predicate];
+	
+	NSError *error;
+	NSArray *groupObjects = [[[DataSource shared] managedObjectContext] executeFetchRequest:request error:&error];
+	[request release];
+	
+	for (id obj in groupObjects) {
+		[[[DataSource shared] managedObjectContext] deleteObject:obj];
 	}
+	
+	[[DataSource shared] saveContext];
+}
 
 + (DataSource *)shared 
 { 

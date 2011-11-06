@@ -29,11 +29,17 @@
 	
 	NSEntityDescription *groupEntityDescription = [NSEntityDescription entityForName:@"Group"
 															   inManagedObjectContext:[[DataSource shared] managedObjectContext]];
+	
+	NSSortDescriptor *nameSortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"name"
+																		  ascending:YES];
+	
 	NSFetchRequest *groupRequest = [[NSFetchRequest alloc] init];
 	[groupRequest setEntity:groupEntityDescription];
+	[groupRequest setSortDescriptors:[NSArray arrayWithObject:nameSortDescriptor]];
 	
 	NSError *error;
 	NSArray *groupObjects = [[[DataSource shared] managedObjectContext] executeFetchRequest:groupRequest error:&error];
+
 	
 	NSMutableArray *array = [[NSMutableArray alloc] init];
 	for (id obj in groupObjects ) {
@@ -67,10 +73,11 @@
 	self.navigationItem.rightBarButtonItem = doneBtn;
 	[doneBtn release];
 	
-	UIBarButtonItem *addBtn = [[UIBarButtonItem alloc] initWithTitle:@"Add"
-															   style:UIBarButtonItemStylePlain
-															  target:self 
-															  action:nil];
+	UIBarButtonItem *addBtn = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd 
+																			target:self
+																			action:nil];
+
+	
 	self.navigationItem.leftBarButtonItem = addBtn;
 	[addBtn release];
 	
@@ -107,6 +114,7 @@
 		cell = [[[UITableViewCell alloc]
 				 initWithStyle:UITableViewCellStyleDefault reuseIdentifier: groupsCell] autorelease];
 	}
+	
 	// Configure the cell
 	NSUInteger row = [indexPath row]; 
 	GroupSpecViewController *controller = [self.controllers objectAtIndex:row]; 
@@ -119,13 +127,31 @@
 #pragma mark -
 #pragma mark Table View Delegate Methods
 
-- (void)tableView:(UITableView *)tableView
-didSelectRowAtIndexPath:(NSIndexPath *)indexPath { 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath { 
 	NSUInteger row = [indexPath row];
 	GroupSpecViewController *nextController = [self.controllers
 												 objectAtIndex:row]; 
 	[self.navigationController pushViewController:nextController animated:YES];
 }
 
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSUInteger row = [indexPath row];
+	NSString *groupTitle = [[self.controllers objectAtIndex:row] title];
+    [self.controllers removeObjectAtIndex:row];
+    [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                     withRowAnimation:UITableViewRowAnimationFade];
+	
+	[[DataSource shared] removeGroup:groupTitle];
+}
+
+/*- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    NSUInteger fromRow = [fromIndexPath row];
+    NSUInteger toRow = [toIndexPath row];
+	
+    id object = [[self.controllers objectAtIndex:fromRow] retain];
+    [self.controllers removeObjectAtIndex:fromRow];
+    [self.controllers insertObject:object atIndex:toRow];
+    [object release];
+}*/
 
 @end

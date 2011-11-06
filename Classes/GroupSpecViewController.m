@@ -26,17 +26,41 @@
 }
 
 - (void)viewDidLoad {
-	/*NSArray *array = [[NSArray alloc] initWithObjects:
-					  NSLocalizedStringFromTable(@"BarsAndRestaurantsGroup", @"JustSpotLocalizable", nil),
-					  NSLocalizedStringFromTable(@"SportGroup", @"JustSpotLocalizable", nil),
-					  NSLocalizedStringFromTable(@"WorkGroup", @"JustSpotLocalizable", nil),
-					  NSLocalizedStringFromTable(@"EntertainmentGroup", @"JustSpotLocalizable", nil),
-					  NSLocalizedStringFromTable(@"ShopGroup", @"JustSpotLocalizable", nil),
-					  NSLocalizedStringFromTable(@"MiscellaneousGroup", @"JustSpotLocalizable", nil),					  
-					  nil];
-	self.spotsList = array;
-	[array release]; */
+	
+	UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] 
+													  initWithTarget:self action:@selector(handleLongPress:)];
+	longPressGesture.minimumPressDuration = 2.0; //seconds
+	longPressGesture.delegate = self;
+	[self.tableView addGestureRecognizer:longPressGesture];
+	[longPressGesture release];
+	
 	[super viewDidLoad];
+}
+
+- (void)handleLongPress:(UILongPressGestureRecognizer *)gestureRecognizer
+{	
+	[self.tableView setEditing: YES animated: YES];
+	
+	UIBarButtonItem *doneBtn = [[UIBarButtonItem alloc] initWithTitle:@"Done"
+																style:UIBarButtonItemStyleDone
+															   target:self 
+															   action:@selector(editDone)];
+	self.navigationItem.rightBarButtonItem = doneBtn;
+	[doneBtn release];
+	
+	UIBarButtonItem *addBtn = [[UIBarButtonItem alloc] initWithTitle:@"Add"
+															   style:UIBarButtonItemStylePlain
+															  target:self 
+															  action:nil];
+	self.navigationItem.leftBarButtonItem = addBtn;
+	[addBtn release];
+	
+}
+
+- (void)editDone {
+	[self.tableView setEditing:NO animated:YES];
+	self.navigationItem.rightBarButtonItem = nil;
+	self.navigationItem.leftBarButtonItem = nil;
 }
 
 - (void)viewDidUnload {

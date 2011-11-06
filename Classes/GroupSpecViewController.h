@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 @class SpotViewController;
 
-@interface GroupSpecViewController : UITableViewController {
+@interface GroupSpecViewController : UITableViewController <UIGestureRecognizerDelegate> {
 	SpotViewController *spotController;
 }
 
